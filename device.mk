@@ -26,3 +26,5 @@ PRODUCT_PACKAGES += \
     update_engine \
     update_engine_sideload \
     update_verifier \
+PRODUCT_SHIPPING_API_LEVEL := 34
+PRODUCT_PACKAGES += service

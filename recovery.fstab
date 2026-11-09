@@ -35,3 +35,7 @@ odm	/odm	erofs	ro	wait,avb,logical,first_stage_mount
 # VOLD
 #/devices/platform/13200000.usb*                auto    vfat    default    voldmanaged=usb:auto
 #/devices/platform/100e0000.dwmmc2/mmc_host*    auto    auto    default    voldmanaged=sdcard:auto	/init_boot	emmc	default	recoveryonly
+
+# Existing Android data only: never initialize keys or repair/format automatically.
+/dev/block/by-name/metadata /metadata ext4 ro,noload,noatime,nosuid,nodev wait
+/dev/block/by-name/userdata /data f2fs noatime,nosuid,nodev,inlinecrypt wait,fileencryption=aes-256-xts:aes-256-cts:v2+inlinecrypt_optimized+wrappedkey_v0,metadata_encryption=aes-256-xts:wrappedkey_v0,keydirectory=/metadata/vold/metadata_encryption

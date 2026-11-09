@@ -7,7 +7,7 @@ if [ "${FOX_BUILD_DEVICE:-}" = a35x ] || [ "${1:-}" = a35x ]; then
     export OF_MAINTAINER="Private SM-A356E port"
     export FOX_TARGET_DEVICES=a35x
     export FOX_VANILLA_BUILD=1
-    export OF_SKIP_FBE_DECRYPTION=1
+    unset OF_SKIP_FBE_DECRYPTION
     export OF_SKIP_DECRYPTED_ADOPTED_STORAGE=1
     export OF_FORCE_PREBUILT_KERNEL=1
     export FOX_USE_TWRP_RECOVERY_IMAGE_BUILDER=1

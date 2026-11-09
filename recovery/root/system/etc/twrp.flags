@@ -29,3 +29,6 @@
 # Removable partitions
 /external_sd	auto		/dev/block/mmcblk0p1	/dev/block/mmcblk0	flags=storage;wipeingui;removable
 /usb-otg	auto		/dev/block/sdf1		/dev/block/sdf		flags=storage;wipeingui;removable
+
+/metadata ext4 /dev/block/by-name/metadata flags=display="Metadata";backup=0
+/data f2fs /dev/block/by-name/userdata flags=display="Data";backup=1;usermrf;settingsstorage;storage
