@@ -53,5 +53,15 @@ until service check android.system.keystore2.IKeystoreService/default 2>/dev/nul
     n=$((n+1)); [ "$n" -lt 20 ] || fail "Keystore did not register"
     sleep 1
 done
+# Weaver's backing directory becomes accessible after DE keys are installed.
+(
+    n=0
+    until [ -d /data/system_de/0/spblob ]; do
+        n=$((n+1))
+        [ "$n" -lt 90 ] || { echo 'Weaver: DE storage did not unlock'; exit 1; }
+        sleep 1
+    done
+    setprop ctl.start a35x-hermes
+) >> /tmp/a35x-hermes-start.log 2>&1 &
 echo 'a35x crypto: security services ready; starting existing-data unlock'
 exit 0

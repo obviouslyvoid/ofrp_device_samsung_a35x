@@ -1,3 +1,6 @@
+on init
+    install_keyring
+
 # Services are started by the recovery decrypt preparation hook.
 service a35x-tzdaemon /vendor/bin/tzdaemon
     user root
@@ -24,5 +27,15 @@ service a35x-gatekeeper /vendor/bin/hw/android.hardware.gatekeeper@1.0-service
     user root
     group root system
     disabled
+    seclabel u:r:recovery:s0
+    setenv LD_LIBRARY_PATH /system/lib64/a35x-vndk33:/vendor/lib64
+
+# Samsung Weaver requires init to supply its bound SecNVM socket.
+service a35x-hermes /vendor/bin/hermesd /data/vendor/gatekeeper
+    class hal
+    user root
+    group root system 5678
+    disabled
+    socket hermes_secnvm stream 0660 system system
     seclabel u:r:recovery:s0
     setenv LD_LIBRARY_PATH /system/lib64/a35x-vndk33:/vendor/lib64
