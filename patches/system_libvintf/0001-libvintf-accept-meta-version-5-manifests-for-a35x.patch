@@ -1,0 +1,28 @@
+From eb340d8ea242abb6e5ffe7e0a3ce93eb3573acdb Mon Sep 17 00:00:00 2001
+From: obviouslyvoid <obviouslyvoid@users.noreply.github.com>
+Date: Tue, 10 Nov 2026 18:53:51 +0200
+Subject: [PATCH] libvintf: accept meta-version 5 manifests for a35x
+
+The installed vendor manifest uses schema 5 (KeyMint); raise
+kMetaVersion so recovery can parse it.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Change-Id: I1775a9f7b7b74fedd2f6002f7bddbf2e759b862b
+---
+ include/vintf/constants.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/include/vintf/constants.h b/include/vintf/constants.h
+index 6c56451..6b471ce 100644
+--- a/include/vintf/constants.h
++++ b/include/vintf/constants.h
+@@ -23,7 +23,8 @@ namespace android {
+ namespace vintf {
+ 
+ /* libvintf meta-version */
+-constexpr Version kMetaVersion{4, 0};
++// a35x: parse the installed vendor manifest schema used by KeyMint.
++constexpr Version kMetaVersion{5, 0};
+ 
+ // Default version for an AIDL HAL if no version is specified.
+ constexpr size_t kDefaultAidlMinorVersion = 1;

@@ -1,0 +1,86 @@
+From f08ca6dda35bdab802e179e3f77f5d2dfa1a673c Mon Sep 17 00:00:00 2001
+From: obviouslyvoid <obviouslyvoid@users.noreply.github.com>
+Date: Tue, 10 Nov 2026 18:51:09 +0200
+Subject: [PATCH 1/2] a35x: gate recovery decryption on Samsung security
+ services
+
+Run /system/bin/a35x-crypto-prepare.sh before Decrypt_Data and only
+decrypt once a35x.crypto.ready=1; start keystore2 on that property;
+never fall through to legacy block decryption after failed FBE setup;
+use /etc/recovery.fstab for metadata decryption when no additional
+fstab is imported; ship the 'service' binary for servicemanager.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ Android.mk            |  3 ++-
+ etc/init/keystore2.rc |  4 +++-
+ partitionmanager.cpp  | 13 +++++++++++--
+ 3 files changed, 16 insertions(+), 4 deletions(-)
+
+diff --git a/Android.mk b/Android.mk
+index ead7dee..ebe419a 100755
+--- a/Android.mk
++++ b/Android.mk
+@@ -569,7 +569,8 @@ TWRP_REQUIRED_MODULES += \
+     TWRP_REQUIRED_MODULES += \
+         plat_service_contexts \
+         servicemanager \
+-        servicemanager.rc
++        servicemanager.rc \
++        service
+     endif
+ endif
+ 
+diff --git a/etc/init/keystore2.rc b/etc/init/keystore2.rc
+index fa62662..1030a70 100644
+--- a/etc/init/keystore2.rc
++++ b/etc/init/keystore2.rc
+@@ -6,7 +6,9 @@
+ #
+ # See system/core/init/README.md for information on the init.rc language.
+ 
+-on late-init
++on property:a35x.crypto.ready=1
++    mkdir /tmp/misc 0700 root root
++    mkdir /tmp/misc/keystore 0700 root root
+     start keystore2
+ 
+ service keystore2 /system/bin/keystore2 /tmp/misc/keystore
+diff --git a/partitionmanager.cpp b/partitionmanager.cpp
+index b52a7d4..00277cd 100755
+--- a/partitionmanager.cpp
++++ b/partitionmanager.cpp
+@@ -627,7 +627,10 @@ void TWPartitionManager::Setup_Fstab_Partitions(bool Display_Error) {
+ 
+ 	#ifdef TW_INCLUDE_CRYPTO
+ 		DataManager::SetValue(TW_IS_ENCRYPTED, 1);
+-		Decrypt_Data();
++		bool a35x_crypto_ready = !TWFunc::Path_Exists("/system/bin/a35x-crypto-prepare.sh") ||
++			TWFunc::Exec_Cmd("/system/bin/sh /system/bin/a35x-crypto-prepare.sh >> /tmp/a35x-crypto.log 2>&1") == 0;
++		if (a35x_crypto_ready) Decrypt_Data();
++		else LOGERR("a35x: security services unavailable; see /tmp/a35x-crypto.log\n");
+ 	#endif
+ 
+ 		Update_System_Details();
+@@ -682,7 +685,7 @@ void TWPartitionManager::Decrypt_Data() {
+ 			Set_Crypto_Type("file");
+ #ifdef TW_INCLUDE_FBE_METADATA_DECRYPT
+ #ifdef USE_FSCRYPT
+-			if (android::vold::fscrypt_mount_metadata_encrypted(Decrypt_Data->Actual_Block_Device, Decrypt_Data->Mount_Point, false, false, Decrypt_Data->Current_File_System, TWFunc::Path_Exists(additional_fstab) ? additional_fstab : "")) {
++			if (android::vold::fscrypt_mount_metadata_encrypted(Decrypt_Data->Actual_Block_Device, Decrypt_Data->Mount_Point, false, false, Decrypt_Data->Current_File_System, TWFunc::Path_Exists(additional_fstab) ? additional_fstab : "/etc/recovery.fstab")) {
+ 				std::string crypto_blkdev = android::base::GetProperty("ro.crypto.fs_crypto_blkdev", "error");
+ 				Decrypt_Data->Decrypted_Block_Device = crypto_blkdev;
+ 				LOGINFO("Successfully decrypted metadata encrypted data partition with new block device: '%s'\n", crypto_blkdev.c_str());
+@@ -2327,6 +2330,12 @@ void TWPartitionManager::Check_Users_Decryption_Status() {
+ 
+ int TWPartitionManager::Decrypt_Device(string Password, int user_id) {
+ #ifdef TW_INCLUDE_CRYPTO
++  if (TWFunc::Path_Exists("/system/bin/a35x-crypto-prepare.sh") &&
++      android::base::GetProperty("a35x.crypto.ready", "") != "1") return -1;
++  // Failed FBE initialization must never fall through to legacy block decryption.
++  if (TWFunc::Path_Exists("/system/bin/a35x-crypto-prepare.sh") &&
++      android::base::GetProperty("ro.crypto.type", "") == "file" &&
++      !DataManager::GetIntValue(TW_IS_FBE)) return -1;
+   char crypto_blkdev[PROPERTY_VALUE_MAX];
+   std::vector < TWPartition * >::iterator iter;
+ 
