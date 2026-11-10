@@ -13,11 +13,11 @@ Tested on SM-A356E with LineageOS 24 (Android 17):
 - Boots, display, touch, ADB, MTP (after data is decrypted)
 - Data decryption (FBE + metadata encryption, wrapped keys) with the lockscreen PIN
 - Settings saved in `/sdcard/Fox`; OrangeFox recovery password works before data is decrypted
-- Flashlight (Power + Volume Up)
+- Flashlight (Power + Volume Up), screenshots (Power + Volume Down, saved to `/sdcard/Fox/screenshots`)
 - Normal charging speed in recovery
 - Power off from recovery, then power on, boots Android (not recovery)
 
-Not tested yet: screenshots, backup/restore, zip installs/OTA, decryption on One UI.
+Not tested yet: backup/restore, zip installs/OTA, decryption on One UI.
 
 ## How to build
 
@@ -33,7 +33,7 @@ Not tested yet: screenshots, backup/restore, zip installs/OTA, decryption on One
 
    ```sh
    cd ~/fox_12.1
-   git clone <this repository> -b fox_12.1 device/samsung/a35x
+   git clone https://github.com/obviouslyvoid/ofrp_device_samsung_a35x -b fox_12.1 device/samsung/a35x
    bash device/samsung/a35x/patches/apply.sh
    ```
 
