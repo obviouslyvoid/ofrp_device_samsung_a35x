@@ -37,3 +37,10 @@ service watchdogd /system/bin/watchdogd 10 20
     class core
     oneshot
     seclabel u:r:watchdogd:s0
+
+# Samsung's bootloader saves REBOOT_MODE=4 (recovery) in PARAM, and recovery's
+# Power off does not reset it, so the next cold power-on returns to recovery.
+# Consume that saved selection once recovery starts; this only affects the next
+# ordinary power-on. Source: tools/a35-normal-boot/a35-normal-boot.c
+on fs
+    exec u:r:recovery:s0 root root -- /system/bin/a35-normal-boot
