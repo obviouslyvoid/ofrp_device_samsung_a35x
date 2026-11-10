@@ -160,9 +160,8 @@ PB_TORCH_PATH := "/sys/devices/virtual/camera/flash/rear_flash"
 PB_TORCH_MAX_BRIGHTNESS := 1
 
 # Version/Maintainer
-TW_DEVICE_VERSION := SM-A356E private unofficial
 SHRP_MAINTAINER := SavedByLight Pre-Release
-MAINTAINER := SavedByLight
+MAINTAINER := obviouslyvoid
 
 # Installed LineageOS uses fscrypt v2 with hardware wrapped keys.
 TW_USE_FSCRYPT_POLICY := 2

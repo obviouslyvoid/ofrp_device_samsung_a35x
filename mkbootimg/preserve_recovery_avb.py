@@ -3,7 +3,7 @@
 
 This does not create or flash the separate vbmeta partition. The baseline AVB
 block intentionally remains byte-identical, including its verification result.
-It is a compatibility input for this already-unlocked private test device.
+It keeps the recovery image accepted by this device's bootloader.
 """
 import argparse
 import hashlib

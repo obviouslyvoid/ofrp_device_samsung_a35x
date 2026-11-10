@@ -11,8 +11,9 @@ on init
     mkdir /efs
     mkdir /sec_efs
     
-# To cut charging battery path
-    write /sys/class/power_supply/battery/siop_level 0
+# Use Samsung normal charging policy; retain driver thermal and PD limits.
+# (siop_level 0 limits charging to 100mA.)
+    write /sys/class/power_supply/battery/siop_level 100
 
 on late-init
     setprop sys.usb.controller 13200000.dwc3

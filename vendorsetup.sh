@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# OrangeFox options for the private SM-A356E recovery-only target.
+# OrangeFox build options for the Samsung Galaxy A35 5G (SM-A356E, a35x).
 if [ "${FOX_BUILD_DEVICE:-}" = a35x ] || [ "${1:-}" = a35x ]; then
     export FOX_BUILD_DEVICE=a35x
     export FOX_BUILD_TYPE=Unofficial
-    export OF_MAINTAINER="Private SM-A356E port"
+    export OF_MAINTAINER="obviouslyvoid"
     export FOX_TARGET_DEVICES=a35x
     export FOX_VANILLA_BUILD=1
     unset OF_SKIP_FBE_DECRYPTION
