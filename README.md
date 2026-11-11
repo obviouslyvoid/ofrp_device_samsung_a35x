@@ -15,6 +15,7 @@ Tested on SM-A356E with LineageOS 24 (Android 17):
 - Settings saved in `/sdcard/Fox`; OrangeFox recovery password works before data is decrypted
 - Flashlight (Power + Volume Up), screenshots (Power + Volume Down, saved to `/sdcard/Fox/screenshots`)
 - Normal charging speed in recovery
+- Format Data (real F2FS format, also wipes `/metadata` keys)
 - Power off from recovery, then power on, boots Android (not recovery)
 
 Not tested yet: backup/restore, zip installs/OTA, decryption on One UI.
@@ -61,6 +62,8 @@ Output in `out/target/product/a35x/`:
 - `a35-normal-boot` (source in `tools/a35-normal-boot/`) clears Samsung's saved
   recovery boot selection (PARAM `REBOOT_MODE` 4 -> 0) at recovery start, so a
   cold power-on after "Power off" boots Android.
+- `twrp/` (`TARGET_RECOVERY_TWRP_LIB`) stops the Weaver service before Format Data,
+  because it keeps files open on `/data`.
 - `mkbootimg/` keeps the recovery's embedded AVB block that the bootloader
   accepts on this device.
 

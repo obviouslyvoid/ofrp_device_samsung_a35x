@@ -94,6 +94,8 @@ TARGET_USERIMAGES_USE_F2FS := true
 TW_INCLUDE_NTFS_3G := true
 TARGET_USES_MKE2FS := true
 TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/recovery.fstab
+# Device hooks for Format Data (stop Samsung Weaver so /data can be released)
+TARGET_RECOVERY_TWRP_LIB := librecovery_twrp_a35x
 
 # Verified Boot
 BOARD_AVB_ENABLE := false
