@@ -25,6 +25,8 @@ for key in ro.build.version.release ro.build.version.sdk ro.build.version.securi
     [ -n "$value" ] || fail "Missing ROM security property"
     /sbin/resetprop -n "$key" "$value" || fail "Cannot set ROM security property"
 done
+# Only build.prop was needed; release system so ROM installs can remap it.
+umount /tmp/a35x-system 2>/dev/null || umount -l /tmp/a35x-system 2>/dev/null || true
 for key in ro.vendor.build.security_patch ro.vendor.build.version.sdk; do
     value=$(prop "$key" "$vp")
     [ -z "$value" ] || /sbin/resetprop -n "$key" "$value"

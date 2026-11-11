@@ -14,5 +14,10 @@ while [ $n -lt 50 ]; do
     [ $busy -eq 0 ] && break
     sleep 0.1; n=$((n+1))
 done
-echo "I:a35x: vendor services stopped before /vendor unmount" >> /tmp/recovery.log
+# Release the other dynamic partitions this device mounts for decryption,
+# so the ROM installer can unmap and resize them.
+for m in /tmp/a35x-system /odm; do
+    grep -q " $m " /proc/mounts && umount "$m"
+done
+echo "I:a35x: vendor services stopped, /odm and system released before ROM install" >> /tmp/recovery.log
 exit 0
