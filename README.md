@@ -16,9 +16,10 @@ Tested on SM-A356E with LineageOS 24 (Android 17):
 - Flashlight (Power + Volume Up), screenshots (Power + Volume Down, saved to `/sdcard/Fox/screenshots`)
 - Normal charging speed in recovery
 - Format Data (real F2FS format, also wipes `/metadata` keys)
+- ROM zip installs with dynamic partitions (tested with PixelOS)
 - Power off from recovery, then power on, boots Android (not recovery)
 
-Not tested yet: backup/restore, zip installs/OTA, decryption on One UI.
+Not tested yet: backup/restore, OTA updates, decryption on One UI.
 
 ## How to build
 
@@ -64,6 +65,8 @@ Output in `out/target/product/a35x/`:
   cold power-on after "Power off" boots Android.
 - `twrp/` (`TARGET_RECOVERY_TWRP_LIB`) stops the Weaver service before Format Data,
   because it keeps files open on `/data`.
+- `pre_vendor_unmount.sh` stops the vendor services and releases `/odm` and the
+  system image before a ROM install, so the installer can remap `super`.
 - `mkbootimg/` keeps the recovery's embedded AVB block that the bootloader
   accepts on this device.
 
