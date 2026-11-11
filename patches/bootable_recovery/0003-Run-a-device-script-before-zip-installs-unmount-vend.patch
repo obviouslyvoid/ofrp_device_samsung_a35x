@@ -1,0 +1,40 @@
+From 3533de408fa74efbdad7092eadcc15f0b1e64b88 Mon Sep 17 00:00:00 2001
+From: obviouslyvoid <obviouslyvoid@users.noreply.github.com>
+Date: Wed, 11 Nov 2026 16:37:46 +0200
+Subject: [PATCH 3/3] Run a device script before zip installs unmount /vendor
+
+FOX_PRE_VENDOR_UNMOUNT_SCRIPT (/system/bin/pre_vendor_unmount.sh) lets a device stop services running from /vendor, so ROM installs can unmount it.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ twrpinstall/twinstall.cpp | 3 +++
+ variables.h               | 2 ++
+ 2 files changed, 5 insertions(+)
+
+diff --git a/twrpinstall/twinstall.cpp b/twrpinstall/twinstall.cpp
+index 3691a2f..7d9b23f 100755
+--- a/twrpinstall/twinstall.cpp
++++ b/twrpinstall/twinstall.cpp
+@@ -378,6 +378,9 @@ int TWinstall_zip(const char *path, int *wipe_cache, bool check_for_digest)
+ 
+    if (unmount_vendor) {
+ 	if (PartitionManager.Is_Mounted_By_Path("/vendor")) {
++		// let the device release /vendor (services running from it) first
++		if (TWFunc::Path_Exists(FOX_PRE_VENDOR_UNMOUNT_SCRIPT))
++			TWFunc::RunFoxScript(FOX_PRE_VENDOR_UNMOUNT_SCRIPT, "");
+ 		gui_msg("unmount_vendor=Unmounting Vendor...");
+ 		if (PartitionManager.UnMount_By_Path("/vendor", false)) {
+ 		   	//unlink("/vendor");
+diff --git a/variables.h b/variables.h
+index 9dd6569..3075bed 100644
+--- a/variables.h
++++ b/variables.h
+@@ -124,6 +124,8 @@ static int Fox_Current_ROM_IsMIUI = 0; // is the currently installed ROM a MIUI
+ #endif
+ #define FOX_PASS_IN_PERSIST 		FOX_PASS_BACKUP_MOUNT "/.fsec"
+ #define FOX_PRE_ROM_FLASH_SCRIPT  	"/system/bin/pre_rom_flash.sh"
++// device script run before a zip install unmounts /vendor (eg, to stop vendor services)
++#define FOX_PRE_VENDOR_UNMOUNT_SCRIPT	"/system/bin/pre_vendor_unmount.sh"
+ #define FOX_POST_ROM_FLASH_SCRIPT 	"/system/bin/post_rom_flash.sh"
+ #define FOX_BEFORE_REBOOT_SCRIPT 	"/system/bin/beforereboot.sh"
+ #define FOX_AFTER_ROM_FLASH_SCRIPT	"/sbin/afterromflash.sh"
