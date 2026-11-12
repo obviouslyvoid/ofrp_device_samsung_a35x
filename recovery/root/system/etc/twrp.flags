@@ -13,7 +13,11 @@
 /boot		emmc		/dev/block/by-name/boot		flags=backup=1;flashimg;display="Boot"
 /recovery	emmc		/dev/block/by-name/recovery		flags=backup=1;flashimg;display="Recovery"
 /cache		ext4		/dev/block/by-name/cache		flags=backup=1;display="Cache"
-/efs		ext4		/dev/block/by-name/efs		flags=backup=1;display="EFS"
+# EFS and CP EFS (IMEI, modem calibration): read-only in recovery (cpefs is a read-only
+# device; the TEE services already
+# mount it read-only at /mnt/vendor/efs for decryption; never wipeable from the GUI.
+/efs		ext4		/dev/block/by-name/efs		flags=backup=1;display="EFS";fsflags="ro"
+/cpefs		ext4		/dev/block/by-name/cpefs		flags=backup=1;display="CP EFS";fsflags="ro"
 /sec_efs	ext4		/dev/block/by-name/sec_efs		flags=backup=1;display="Sec EFS"
 /modem		emmc		/dev/block/by-name/radio		flags=backup=1;display="Modem"
 /dtbo		emmc		/dev/block/by-name/dtbo		flags=backup=1;flashimg;display="Dtbo"

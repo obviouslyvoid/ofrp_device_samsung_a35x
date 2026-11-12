@@ -19,8 +19,6 @@ odm	/odm	erofs	ro	wait,avb,logical,first_stage_mount
 /dev/block/by-name/dtbo		/dtbo               emmc      defaults                                              first_stage_mount,formattable,avb=dtbo
 /dev/block/by-name/vbmeta	/vbmeta               emmc      defaults					       first_stage_mount,formattable,avb=vbmeta
 /dev/block/by-name/vbmeta_system	/vbmeta_system      emmc      defaults                                     first_stage_mount,formattable,avb=vbmeta_system
-/dev/block/by-name/efs	/mnt/vendor/efs	ext4	noatime,nosuid,nodev,noauto_da_alloc,discard,journal_checksum,data=ordered,errors=panic	wait,formattable,check
-/dev/block/by-name/cpefs	/mnt/vendor/cpefs	ext4	noatime,nosuid,nodev,noauto_da_alloc,discard,journal_checksum,data=ordered,errors=panic	wait,check,nofail
 #/dev/block/by-name/persist   /mnt/vendor/persist ext4      noatime,nosuid,nodev,barrier=1,data=ordered,nodelalloc,nomblk_io_submit,errors=panic wait,notrim,formattable
 /dev/block/by-name/misc	/misc	emmc	defaults	defaults,first_stage_mount
 /dev/block/by-name/recovery	/recovery           emmc      defaults                                              first_stage_mount

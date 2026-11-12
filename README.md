@@ -66,7 +66,10 @@ Output in `out/target/product/a35x/`:
 - `twrp/` (`TARGET_RECOVERY_TWRP_LIB`) stops the Weaver service before Format Data,
   because it keeps files open on `/data`.
 - `pre_vendor_unmount.sh` stops the vendor services and releases `/odm` and the
-  system image before a ROM install, so the installer can remap `super`.
+  system image before any explicit `/vendor` unmount (Mount screen, ROM installs),
+  so `/vendor` can be unmounted and the installer can remap `super`.
+- EFS and CP EFS mount read-only and are not wipeable from the GUI (IMEI and modem
+  calibration live there); back them up from the Backup screen.
 - `mkbootimg/` keeps the recovery's embedded AVB block that the bootloader
   accepts on this device.
 

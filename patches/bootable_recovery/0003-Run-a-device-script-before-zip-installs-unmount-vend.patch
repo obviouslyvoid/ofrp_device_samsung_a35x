@@ -1,7 +1,7 @@
 From 3533de408fa74efbdad7092eadcc15f0b1e64b88 Mon Sep 17 00:00:00 2001
 From: obviouslyvoid <obviouslyvoid@users.noreply.github.com>
 Date: Wed, 11 Nov 2026 16:37:46 +0200
-Subject: [PATCH 3/3] Run a device script before zip installs unmount /vendor
+Subject: [PATCH 3/4] Run a device script before zip installs unmount /vendor
 
 FOX_PRE_VENDOR_UNMOUNT_SCRIPT (/system/bin/pre_vendor_unmount.sh) lets a device stop services running from /vendor, so ROM installs can unmount it.
 

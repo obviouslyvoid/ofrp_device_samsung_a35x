@@ -1,0 +1,125 @@
+From 078076449829374ad9fcec8064559f1908686d39 Mon Sep 17 00:00:00 2001
+From: obviouslyvoid <obviouslyvoid@users.noreply.github.com>
+Date: Thu, 12 Nov 2026 20:08:15 +0200
+Subject: [PATCH 4/4] Run the pre-vendor-unmount script for every explicit
+ /vendor unmount
+
+Add TWFunc::Prepare_Vendor_Unmount() and call it from the Mount screen, the unmount action, OpenRecoveryScript unmount, zip installs and the repacker, so devices whose vendor services run from /vendor can release it on request.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ gui/action.cpp            |  1 +
+ gui/partitionlist.cpp     |  2 ++
+ openrecoveryscript.cpp    |  1 +
+ twrp-functions.cpp        | 10 ++++++++++
+ twrp-functions.hpp        |  3 ++-
+ twrpRepacker.cpp          |  1 +
+ twrpinstall/twinstall.cpp |  4 +---
+ 7 files changed, 18 insertions(+), 4 deletions(-)
+
+diff --git a/gui/action.cpp b/gui/action.cpp
+index f13a486..e37f98b 100755
+--- a/gui/action.cpp
++++ b/gui/action.cpp
+@@ -993,6 +993,7 @@ int GUIAction::unmount(std::string arg)
+     }
+   else if (!simulate)
+     {
++      TWFunc::Prepare_Vendor_Unmount(arg);
+       PartitionManager.UnMount_By_Path(arg, true);
+     }
+   else
+diff --git a/gui/partitionlist.cpp b/gui/partitionlist.cpp
+index 9a67f2c..dda0117 100644
+--- a/gui/partitionlist.cpp
++++ b/gui/partitionlist.cpp
+@@ -32,6 +32,7 @@ extern "C" {
+ #include "objects.hpp"
+ #include "../data.hpp"
+ #include "../partitions.hpp"
++#include "../twrp-functions.hpp"
+ 
+ GUIPartitionList::GUIPartitionList(xml_node<>* node) : GUIScrollList(node)
+ {
+@@ -318,6 +319,7 @@ void GUIPartitionList::NotifySelect(size_t item_selected)
+ 					mUpdate = 1;
+ 				}
+ 			} else {
++				TWFunc::Prepare_Vendor_Unmount(mList.at(item_selected).Mount_Point);
+ 				if (PartitionManager.UnMount_By_Path(mList.at(item_selected).Mount_Point, true)) {
+ 					mList.at(item_selected).selected = 0;
+ 					mUpdate = 1;
+diff --git a/openrecoveryscript.cpp b/openrecoveryscript.cpp
+index ede9994..5b5f5b1 100755
+--- a/openrecoveryscript.cpp
++++ b/openrecoveryscript.cpp
+@@ -358,6 +358,7 @@ int OpenRecoveryScript::run_script_file(void) {
+ 					strcpy(mount, value);
+ 				if (!strcmp(mount, "/system"))
+ 					strcpy(mount, PartitionManager.Get_Android_Root_Path().c_str());
++				TWFunc::Prepare_Vendor_Unmount(mount);
+ 				if (PartitionManager.UnMount_By_Path(mount, true))
+ 					gui_msg(Msg("unmounted=Unounted '{1}'")(mount));
+ 			} else if (strcmp(command, "set") == 0 || strcmp(command, "setval") == 0) {
+diff --git a/twrp-functions.cpp b/twrp-functions.cpp
+index 0a8605a..3e13ef0 100755
+--- a/twrp-functions.cpp
++++ b/twrp-functions.cpp
+@@ -315,6 +315,16 @@ bool ret = false;
+     return ret;
+ }
+ 
++// Let the device release /vendor (eg, stop services running from it) before an
++// explicit unmount requested by the user, a script or an installer.
++void TWFunc::Prepare_Vendor_Unmount(const std::string& path)
++{
++	if (TWFunc::Get_Root_Path(path) != "/vendor" || !PartitionManager.Is_Mounted_By_Path("/vendor"))
++		return;
++	if (TWFunc::Path_Exists(FOX_PRE_VENDOR_UNMOUNT_SCRIPT))
++		TWFunc::RunFoxScript(FOX_PRE_VENDOR_UNMOUNT_SCRIPT, "");
++}
++
+ bool TWFunc::RunFoxScript(const std::string script, const std::string args)
+ {
+     if (!Path_Exists(script))
+diff --git a/twrp-functions.hpp b/twrp-functions.hpp
+index e8f2fc2..73f2018 100755
+--- a/twrp-functions.hpp
++++ b/twrp-functions.hpp
+@@ -186,7 +186,8 @@ public:
+ 	static bool Has_System_Root(void); // is this a system-as-root device?
+ 	static int Rename_File(std::string oldname, std::string newname); // rename a file, using std strings
+ 	static bool MIUI_ROM_SetProperty(const int code); // Are we running a MIUI ROM (old or freshly installed) - set fox property
+-	static bool RunFoxScript(const std::string script, const std::string args); // execute a script (with optional arguments) and introduce a delay if the script was executed
++	static bool RunFoxScript(const std::string script, const std::string args);
++	static void Prepare_Vendor_Unmount(const std::string& path); // run FOX_PRE_VENDOR_UNMOUNT_SCRIPT before an explicit /vendor unmount // execute a script (with optional arguments) and introduce a delay if the script was executed
+ 	static bool MIUI_Is_Running(void); // Are we running a MIUI ROM (old or freshly installed) ?
+ 	static bool ROM_Has_MIUI_Props(void); // Another MIUI check - query some MIUI ROM props 
+ 	static void Dump_Current_Settings(void); // log some current settings before flashing a ROM
+diff --git a/twrpRepacker.cpp b/twrpRepacker.cpp
+index 3bac383..5274d51 100755
+--- a/twrpRepacker.cpp
++++ b/twrpRepacker.cpp
+@@ -372,6 +372,7 @@ bool twrpRepacker::Flash_Current_Twrp() {
+ 		return false;
+ 	}
+ 
++	TWFunc::Prepare_Vendor_Unmount("/vendor");
+ 	if (PartitionManager.Is_Mounted_By_Path("/vendor") && !PartitionManager.UnMount_By_Path("/vendor", false)) {
+ 		// Try to force umount /vendor
+ 		PartitionManager.UnMount_By_Path("/vendor", false, MNT_FORCE | MNT_DETACH);
+diff --git a/twrpinstall/twinstall.cpp b/twrpinstall/twinstall.cpp
+index 7d9b23f..d386394 100755
+--- a/twrpinstall/twinstall.cpp
++++ b/twrpinstall/twinstall.cpp
+@@ -378,9 +378,7 @@ int TWinstall_zip(const char *path, int *wipe_cache, bool check_for_digest)
+ 
+    if (unmount_vendor) {
+ 	if (PartitionManager.Is_Mounted_By_Path("/vendor")) {
+-		// let the device release /vendor (services running from it) first
+-		if (TWFunc::Path_Exists(FOX_PRE_VENDOR_UNMOUNT_SCRIPT))
+-			TWFunc::RunFoxScript(FOX_PRE_VENDOR_UNMOUNT_SCRIPT, "");
++		TWFunc::Prepare_Vendor_Unmount("/vendor");
+ 		gui_msg("unmount_vendor=Unmounting Vendor...");
+ 		if (PartitionManager.UnMount_By_Path("/vendor", false)) {
+ 		   	//unlink("/vendor");
