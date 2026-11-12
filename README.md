@@ -72,14 +72,22 @@ Output in `out/target/product/a35x/`:
 
 ## Kernel
 
-Prebuilt kernel `5.15.153-physwizz` by [Physwizz](https://github.com/physwizz)
-(`prebuilt/Image`, `dtb.img`, `dtbo.img`). Kernel source: see Physwizz's
-A35 kernel repository.
+Prebuilt kernel `5.15.220-android13-3-33470412` (`prebuilt/Image`), built from
+[TheBizarreAbhishek/android_kernel_samsung_s5e8835](https://github.com/TheBizarreAbhishek/android_kernel_samsung_s5e8835)
+at commit `ae05d00bd5c70cf806df5ab89d5fa438488bd241`, without KernelSU, using
+[prebuilt/kernel-source/build.sh](prebuilt/kernel-source/build.sh) (applies the
+repository's BBRv3 and ntsync patches and the config shown in the script).
+
+The recovery loads Samsung's stock A35 kernel modules (`recovery/root/lib/modules`,
+5.15.189 KMI, from firmware DZH1 `vendor_boot`), the same set Android loads with
+this kernel. `dtb.img` is from the same `vendor_boot`; `dtbo.img` is the matching
+stock `dtbo` partition.
 
 ## Credits
 
 - [TeamWin](https://github.com/TeamWin) and SavedByLight - original TWRP device tree
 - [OrangeFox Recovery](https://gitlab.com/OrangeFox) team
-- [Physwizz](https://github.com/physwizz) - kernel
+- [TheBizarreAbhishek](https://github.com/TheBizarreAbhishek) - kernel source
+- [Physwizz](https://github.com/physwizz) - kernel used in earlier builds
 - [Ravindu644](https://github.com/ravindu644) - permissive kernel
 - [111hav0c](https://github.com/111hav0c), [drnightshadow](https://github.com/drnightshadow) - testing of the original tree

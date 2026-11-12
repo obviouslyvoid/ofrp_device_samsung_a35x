@@ -1,0 +1,13 @@
+diff --git a/scripts/extract-cert.c b/scripts/extract-cert.c
+index 71b298023..c285de94b 100644
+--- a/scripts/extract-cert.c
++++ b/scripts/extract-cert.c
+@@ -121,7 +121,7 @@ int main(int argc, char **argv)
+ 		fclose(f);
+ 		exit(0);
+ 	} else if (!strncmp(cert_src, "pkcs11:", 7)) {
+-#ifdef OPENSSL_IS_BORINGSSL
++#if defined(OPENSSL_IS_BORINGSSL) || defined(OPENSSL_NO_ENGINE)
+ 		ERR(1, "BoringSSL does not support extracting from PKCS#11");
+ 		exit(1);
+ #else

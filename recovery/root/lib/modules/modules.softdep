@@ -10,6 +10,7 @@ softdep softdog pre: s3c2410_wdt
 softdep fimc_is pre: cmupmucal clk_exynos exynos-pmu-if pinctrl-samsung-core pcie-exynos-rc phy-exynos-mipi samsung-iommu samsung-iommu-group
 softdep mcd_panel pre: s2dos05-regulator i2c-exynos5
 softdep dwc3_exynos_usb pre:phy-exynos-usbdrd-super
+softdep dwc3_exynos_usb pre:dwc3-exynos-usb
 softdep exynos_devfreq pre: exynos_dm exynos_thermal  post: exynos-acme mali_kbase
 softdep is_cis_3l6 pre: fimc-is
 softdep is_cis_gn8 pre: fimc-is
