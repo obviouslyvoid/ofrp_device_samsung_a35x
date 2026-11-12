@@ -17,9 +17,10 @@ Tested on SM-A356E with LineageOS 24 (Android 17):
 - Normal charging speed in recovery
 - Format Data (real F2FS format, also wipes `/metadata` keys)
 - ROM zip installs with dynamic partitions (tested with PixelOS)
+- Backup and restore
 - Power off from recovery, then power on, boots Android (not recovery)
 
-Not tested yet: backup/restore, OTA updates, decryption on One UI.
+Not tested yet: OTA updates, decryption on One UI.
 
 ## How to build
 
